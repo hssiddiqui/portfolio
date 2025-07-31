@@ -4,10 +4,6 @@ title: "Publications"
 author_profile: true
 ---
 
-{% if author.googlescholar %}
-  You can also find my articles on <u><a href="{{author.googlescholar}}">my Google Scholar profile</a>.</u>
-{% endif %}
-
 1. 🆕 **Siddiqui, H.**, Small, C., Modi, V. (2025). Operationalizing Remote Sensing Methods for Smallholder Irrigation Detection in Subsaharan Africa. Pre-peer reviewed preprint
 
 1. **Siddiqui, H.**, Modi, V. (2024). Monitoring the Impacts of Disruption Events on Agriculture Through Irrigation Detection with Remote Sensing. IEEE Global Humanitarian Technology Conference (GHTC), 286-291
