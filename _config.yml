@@ -66,26 +66,26 @@ author:
       icon: "fas fa-fw fa-link"
       url: "https://"
     - label: "LinkedIn"
-      icon: "fab fa-fw fa-linkedin-square"
+      icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/hasan-shoaib-siddiqui/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/hssiddiqui"
     - label: "Google Scholar"
       icon: "fab fa-fw fa-google-scholar"
-      url: "https://instagram.com/"
+      url: "https://scholar.google.com/citations?user=46Rcl1YAAAAJ&hl=en&oi=ao"
 
 footer:
   links:
     - label: "LinkedIn"
-      icon: "fab fa-fw fa-linkedin-square"
+      icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/hasan-shoaib-siddiqui/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/hssiddiqui"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      url: "https://instagram.com/"
+    - label: "Google Scholar"
+      icon: "fab fa-fw fa-google-scholar"
+      url: "https://scholar.google.com/citations?user=46Rcl1YAAAAJ&hl=en&oi=ao"
 
 defaults:
   # _posts
