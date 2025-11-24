@@ -1,7 +1,7 @@
 ---
 title: "Senior Design Project: CKD Design"
-permalink: portfolio/projects/senior-design-project/
-tags: [Engineering, Design, Manufacturing, Eco Marathon] # Use tags for better organization
+permalink: /projects/senior-design-project/
+tags: [Engineering, Design, Manufacturing, Eco Marathon]
 ---
 
 # Senior Design Project: Completely Knocked Down (CKD) Design
@@ -9,10 +9,7 @@ tags: [Engineering, Design, Manufacturing, Eco Marathon] # Use tags for better o
 ### Project Goal
 To design and validate a Completely Knocked Down (CKD) modular chassis for the Shell Eco Marathon Asia 2018, significantly reducing shipping volume and assembly time while maintaining structural integrity.
 
-
-
-[Image of a modular car design]
-
+{% raw %}{% include figure image_path="/assets/images/CKD_chassis.jpg" alt="Image of the CKD modular chassis design" caption="The final vehicle with team members." %}{% endraw %}
 
 ---
 
@@ -29,7 +26,7 @@ To design and validate a Completely Knocked Down (CKD) modular chassis for the S
 This project resulted in a successful entry in the 2018 competition, and the design framework was adopted by the subsequent student team.
 
 **Video Presentation:**
-<iframe src="https://drive.google.com/file/d/1c436ec-D_-nYvT127iEkbByGmbmuW4sF/preview" width="100%" height="480" allow="autoplay" loading="lazy"></iframe>
+<iframe src="https://drive.google.com/file/d/1c436ec-D_-nYvT127EkbByGmbmuW4sF/preview" width="100%" height="480" allow="autoplay" loading="lazy"></iframe>
 
 ---
 
@@ -38,4 +35,8 @@ This project resulted in a successful entry in the 2018 competition, and the des
 * **Teamwork:** Managed a team of 5 engineers through all design, prototyping, and testing phases.
 * **Metric:** Reduced logistical costs by an estimated $5,000 per competition.
 
-**Next Step:** Would you like me to suggest a similar structure for a case study on your **CWP Dashboard** project?
+***
+
+**Important Note:** I used the standard Minimal Mistakes theme helper **`{% raw %}{% include figure %}{% endraw %}`** syntax to ensure the image displays correctly with features like captions and responsiveness.
+
+Do you have any other projects you would like to structure, or would you like feedback on the wording of this specific page?
