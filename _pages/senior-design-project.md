@@ -1,6 +1,6 @@
 ---
 title: "Senior Design Project: CKD Design"
-permalink: /projects/senior-design-project/
+permalink: portfolio/projects/senior-design-project/
 tags: [Engineering, Design, Manufacturing, Eco Marathon] # Use tags for better organization
 ---
 
