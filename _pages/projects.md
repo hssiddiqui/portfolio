@@ -2,7 +2,7 @@
 title: "Projects"
 permalink: /projects/
 author_profile: true
-layout: splash # Suggest changing to 'splash' or 'archive' for a better look
+layout: archive # Suggest changing to 'splash' or 'archive' for a better look
 ---
 
 # My Portfolio of Work
