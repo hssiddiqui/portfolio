@@ -19,5 +19,5 @@ Explore my featured projects, from data analysis to engineering design.
 
 ### **Senior Design Project: CKD Design for Shell Eco Marathon**
 - **Summary:** Complete redesign for manufacturing efficiency at the Shell Eco Marathon Asia 2018.
-- **Read the full case study:** [View Project Case Study](/portfolio/projects/senior-design-project/)
+- **Read the full case study:** [View Project Case Study](https://hssiddiqui.github.io/portfolio/projects/senior-design-project/)
 
