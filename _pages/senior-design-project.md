@@ -9,7 +9,7 @@ tags: [Engineering, Design, Manufacturing, Eco Marathon]
 ### Project Goal
 To design and validate a Completely Knocked Down (CKD) modular chassis for the Shell Eco Marathon Asia 2018, significantly reducing shipping volume and assembly time while maintaining structural integrity.
 
-{% raw %}{% include figure image_path="/assets/images/CKD_chassis.jpg" alt="Image of the CKD modular chassis design" caption="The final vehicle with team members." %}{% endraw %}
+<img style="float: right; padding: 10px 10px 10px 10px;" src="https://github.com/hssiddiqui/portfolio/blob/master/assets/images/CKD_chassis.jpg" width=400>
 
 ---
 
@@ -26,7 +26,7 @@ To design and validate a Completely Knocked Down (CKD) modular chassis for the S
 This project resulted in a successful entry in the 2018 competition, and the design framework was adopted by the subsequent student team.
 
 **Video Presentation:**
-<iframe src="https://drive.google.com/file/d/1c436ec-D_-nYvT127EkbByGmbmuW4sF/preview" width="100%" height="480" allow="autoplay" loading="lazy"></iframe>
+<iframe src="https://drive.google.com/file/d/1c436ec-D_-nYvT127iEkbByGmbmuW4sF/preview" width="640" height="480" allow="autoplay"></iframe>
 
 ---
 
