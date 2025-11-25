@@ -1,8 +1,8 @@
 ---
 title: "Resume"
 permalink: /resume/
-author_profile: false # Setting to false gives more width for the main content
-layout: single
+author_profile: true
+layout: splash
 ---
 
 # Hasan Siddiqui
