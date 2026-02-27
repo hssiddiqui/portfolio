@@ -36,7 +36,3 @@ This project resulted in a successful entry in the 2018 competition, and the des
 * **Metric:** Reduced logistical costs by an estimated $5,000 per competition.
 
 ***
-
-**Important Note:** I used the standard Minimal Mistakes theme helper **`{% raw %}{% include figure %}{% endraw %}`** syntax to ensure the image displays correctly with features like captions and responsiveness.
-
-Do you have any other projects you would like to structure, or would you like feedback on the wording of this specific page?
