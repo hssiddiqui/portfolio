@@ -11,6 +11,12 @@ Explore my featured projects, from data analysis to engineering design.
 
 ---
 
+### **Phenology Maps**
+- **Goal:** Perform PCA analysis from temporal stack of EVI, extract tEMs from feature cloud and unmix to generate phenology maps 
+- **Link:** [View tool](https://qsel.columbia.edu/portfolio/tools/phenology_tEMs.html)
+
+---
+
 ### **CWP Dashboard: Data Sharing Platform**
 - **Goal:** Share data products with external stakeholders.
 - **Link:** [View the Live Dashboard](https://qsel.columbia.edu/cwp-epu-data-platform/)
