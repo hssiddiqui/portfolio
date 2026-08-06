@@ -12,7 +12,7 @@ Explore my featured projects, from data analysis to engineering design.
 ---
 
 ### **Phenology Maps**
-- **Goal:** Perform PCA analysis from temporal stack of EVI, extract tEMs from feature cloud and unmix to generate phenology maps 
+- **Goal:** Perform PCA analysis from temporal stack of MODIS EVI, extract tEMs from feature cloud and unmix to generate phenology maps 
 - **Link:** [View tool](https://hssiddiqui.github.io/portfolio/assets/phenology_tEMs.html)
 
 ---
