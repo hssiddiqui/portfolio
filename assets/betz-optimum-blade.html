@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betz Optimum Blade — Interactive Model</title>
+</head>
+<body>
+<style>
+  :root{
+    --bg:#0C1626; --panel:#121F33; --panel2:#16273F; --line:#24374F; --line2:#1B2C44;
+    --ink:#E9F0F7; --muted:#8FA3BC; --faint:#5E7391;
+    --vel:#56C8F2; --force:#FFB454; --mark:#F25C4A;
+    --phi:#C79BF2; --alpha:#7FD1A8; --thp:#6FA8FF; --tht:#FFD166; --thp0:#93A4BC;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --math:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg)}
+  body{
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); padding:0 20px 28px;
+  }
+  i, .v{font-family:var(--math); font-style:italic}
+  sub,sup{font-size:.68em}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums; font-style:normal}
+
+  header.top{max-width:1460px;margin:0 auto;padding:18px 2px 12px;display:flex;flex-wrap:wrap;gap:10px 24px;align-items:baseline;justify-content:space-between}
+  .eyebrow{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  h1{font-size:21px;font-weight:650;letter-spacing:-.01em;margin-top:2px}
+  .design-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:3px 8px;white-space:nowrap}
+  .chip b{color:var(--ink);font-weight:600}
+
+  .wrap{max-width:1460px;margin:0 auto}
+  .grid-main{display:grid;grid-template-columns:minmax(0,11fr) minmax(0,9fr);gap:14px}
+  @media (max-width:1020px){.grid-main{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .card-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 14px 8px;border-bottom:1px solid var(--line2)}
+  .card-h .t{font-size:13px;font-weight:600}
+  .card-h .s{font-size:11px;color:var(--muted)}
+
+  /* 3D viewport */
+  #stage{position:relative;height:520px}
+  #c3d{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+  #c3d.dragging{cursor:grabbing}
+  .hud{position:absolute;top:10px;right:10px;display:flex;gap:6px}
+  .hud button{
+    font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);
+    background:rgba(18,31,51,.82);border:1px solid var(--line);border-radius:5px;padding:5px 10px;cursor:pointer
+  }
+  .hud button:hover{border-color:var(--faint)}
+  .hud button[aria-pressed="true"]{color:#0C1626;background:var(--vel);border-color:var(--vel);font-weight:600}
+  .hud button:focus-visible,.slider:focus-visible,tr[data-row]:focus-visible{outline:2px solid var(--vel);outline-offset:1px}
+  .stage-note{position:absolute;left:12px;bottom:9px;font-size:11px;color:var(--faint)}
+  .stage-note2{position:absolute;right:12px;bottom:9px;font-size:11px;color:var(--faint);text-align:right}
+
+  /* section panel */
+  #secwrap{position:relative;height:472px}
+  #c2d{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .identity{display:flex;flex-wrap:wrap;gap:4px 26px;padding:9px 14px;border-top:1px solid var(--line2);font-size:12.5px;color:var(--muted)}
+  .identity .num{color:var(--ink)}
+
+  /* control bar */
+  .controls{
+    position:sticky;top:0;z-index:20;margin:14px 0;
+    background:rgba(12,22,38,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--line);border-radius:8px;padding:12px 16px 10px;
+    display:grid;grid-template-columns:minmax(260px,5fr) minmax(0,7fr);gap:8px 26px;align-items:center
+  }
+  @media (max-width:1020px){.controls{grid-template-columns:1fr}}
+  .sliderbox{display:flex;flex-direction:column;gap:2px}
+  .sliderbox .lab{display:flex;justify-content:space-between;align-items:baseline}
+  .sliderbox .lab .name{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .sliderbox .lab .val{font-family:var(--mono);font-size:19px;color:var(--mark);font-weight:600}
+  .slider{appearance:none;-webkit-appearance:none;width:100%;height:26px;background:transparent;cursor:pointer}
+  .slider::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--mark) var(--fill,44%),#27405E var(--fill,44%))}
+  .slider::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--mark);margin-top:-7px;box-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .slider::-moz-range-track{height:5px;border-radius:3px;background:#27405E}
+  .slider::-moz-range-progress{height:5px;border-radius:3px;background:var(--mark)}
+  .slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:4px solid var(--mark)}
+  .ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--faint);padding:0 4px}
+  .readouts{display:flex;flex-wrap:wrap;gap:6px}
+  .ro{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:4px 10px;min-width:86px}
+  .ro .k{font-size:11px;color:var(--muted);white-space:nowrap}
+  .ro .n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;margin-top:1px;white-space:nowrap}
+  .ro .u{font-size:10.5px;color:var(--faint)}
+
+  /* bottom row */
+  .grid-bottom{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+  @media (max-width:1290px){.grid-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:700px){.grid-bottom{grid-template-columns:1fr}}
+  .chartbox{position:relative;height:228px}
+  .chartbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+
+  .tablewrap{overflow-x:auto;padding:4px 8px 8px}
+  table{border-collapse:collapse;width:100%;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12px}
+  th{font:600 11.5px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th:first-child{text-align:left}
+  td{padding:4.5px 8px;text-align:right;border-bottom:1px solid var(--line2);color:var(--ink)}
+  td:first-child{text-align:left}
+  tr[data-row]{cursor:pointer}
+  tr[data-row]:hover td{background:rgba(86,200,242,.07)}
+  tr[data-row].on td{background:rgba(242,92,74,.12)}
+  tr[data-row].on td:first-child{box-shadow:inset 2px 0 0 var(--mark)}
+  .foot-note{font-size:11px;color:var(--faint);padding:2px 14px 10px}
+
+  .eqs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:7px}
+  .eq{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:14px}
+  .eq .f{font-family:var(--math)}
+  .eq .r{font-size:11px;color:var(--faint);font-family:var(--mono)}
+  .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1.1;margin:0 2px}
+  .frac>span:first-child{border-bottom:1px solid var(--ink);padding:0 3px}
+  .assume{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .assume .chip{font-size:11.5px}
+  footer{max-width:1460px;margin:16px auto 0;font-size:11.5px;color:var(--faint);padding:0 2px}
+</style>
+
+<header class="top">
+  <div>
+    <div class="eyebrow">Wind Energy Explained · §3.7 · Ideal rotor without wake rotation</div>
+    <h1>Betz Optimum Blade — Interactive Model</h1>
+  </div>
+  <div class="design-chips">
+    <span class="chip"><i>λ</i> = <b>7</b></span>
+    <span class="chip"><i>B</i> = <b>3</b> blades</span>
+    <span class="chip"><i>C<sub>l</sub></i> = <b>1.0</b></span>
+    <span class="chip"><i>α</i><sub>design</sub> = <b>7°</b></span>
+    <span class="chip"><i>a</i> = <b>1/3</b></span>
+    <span class="chip"><i>a′</i> = <b>0</b></span>
+    <span class="chip"><i>C<sub>d</sub></i> = <b>0</b></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid-main">
+    <section class="card">
+      <div class="card-h">
+        <span class="t">Rotor — geometry generated live from Eqs. (3.78)–(3.79)</span>
+        <span class="s">chord &amp; twist to scale · NACA 4415 sections (illustrative airfoil)</span>
+      </div>
+      <div id="stage">
+        <canvas id="c3d"></canvas>
+        <div class="hud">
+          <button id="btnSpin" aria-pressed="true">Rotor: on</button>
+          <button id="btnWind" aria-pressed="true">Wind: on</button>
+          <button id="btnReset">Reset view</button>
+        </div>
+        <div class="stage-note">drag to orbit · scroll / pinch to zoom · spin &amp; wind animate to scale (λ = 7)</div>
+        <div class="stage-note2">red band marks the section at r/R</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h">
+        <span class="t">Blade section geometry — after Fig. 3.24</span>
+        <span class="s">view from blade tip · airfoil to c/R scale, pivoting about its centroid</span>
+      </div>
+      <div id="secwrap"><canvas id="c2d"></canvas></div>
+      <div class="identity">
+        <span><i>φ</i> = <i>θ<sub>p</sub></i> + <i>α</i> :&nbsp; <span class="num" id="id1"></span> <span class="r num" style="color:var(--faint)">(3.62)</span></span>
+        <span><i>θ<sub>T</sub></i> = <i>θ<sub>p</sub></i> − <i>θ<sub>p,0</sub></i> :&nbsp; <span class="num" id="id2"></span> <span class="r num" style="color:var(--faint)">(3.61)</span></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="controls">
+    <div class="sliderbox">
+      <div class="lab">
+        <span class="name">Radial position&nbsp; <i style="text-transform:none">r</i>/<i style="text-transform:none">R</i></span>
+        <span class="val" id="rrVal">0.50</span>
+      </div>
+      <input class="slider" id="slider" type="range" min="0.1" max="1" step="0.001" value="0.5"
+             aria-label="Radial position r/R">
+      <div class="ticks"><span>0.1</span><span>0.2</span><span>0.3</span><span>0.4</span><span>0.5</span><span>0.6</span><span>0.7</span><span>0.8</span><span>0.9</span><span>1.0</span></div>
+    </div>
+    <div class="readouts" id="readouts">
+      <div class="ro"><div class="k"><i>λ<sub>r</sub></i> local speed ratio</div><div class="n" id="roLr"></div></div>
+      <div class="ro"><div class="k" style="color:var(--phi)"><i>φ</i> rel. wind</div><div class="n" id="roPhi"></div></div>
+      <div class="ro"><div class="k" style="color:var(--alpha)"><i>α</i> attack <span class="u">(design)</span></div><div class="n">7.0°</div></div>
+      <div class="ro"><div class="k" style="color:var(--thp)"><i>θ<sub>p</sub></i> section pitch</div><div class="n" id="roThp"></div></div>
+      <div class="ro"><div class="k" style="color:var(--tht)"><i>θ<sub>T</sub></i> twist</div><div class="n" id="roTht"></div></div>
+      <div class="ro"><div class="k"><i>c</i>/<i>R</i> chord</div><div class="n" id="roC"></div></div>
+      <div class="ro"><div class="k" style="color:var(--vel)"><i>U</i><sub>rel</sub>/<i>U</i></div><div class="n" id="roUrel"></div></div>
+    </div>
+  </div>
+
+  <div class="grid-bottom">
+    <section class="card">
+      <div class="card-h"><span class="t">Blade chord <span class="num" style="font-weight:400;color:var(--muted)">c/R</span></span><span class="s">Fig. 3.25 · click to set r/R</span></div>
+      <div class="chartbox"><canvas id="chChord"></canvas></div>
+    </section>
+    <section class="card">
+      <div class="card-h"><span class="t">Blade twist angle <span class="num" style="font-weight:400;color:var(--muted)">θ<sub>T</sub></span></span><span class="s">Fig. 3.26 · click to set r/R</span></div>
+      <div class="chartbox"><canvas id="chTwist"></canvas></div>
+    </section>
+    <section class="card">
+      <div class="card-h"><span class="t">Table 3.2</span><span class="s">click a row to jump</span></div>
+      <div class="tablewrap">
+        <table id="tbl">
+          <thead><tr>
+            <th><i>r</i>/<i>R</i></th><th><i>c</i>/<i>R</i></th>
+            <th>Twist <i>θ<sub>T</sub></i> (°)</th><th>Rel. wind <i>φ</i> (°)</th><th>Pitch <i>θ<sub>p</sub></i> (°)</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="foot-note">Values as printed in the text; the model computes them live from Eqs. (3.78)–(3.79).</div>
+    </section>
+    <section class="card">
+      <div class="card-h"><span class="t">Governing relations</span><span class="s">ideal Betz rotor</span></div>
+      <div class="eqs">
+        <div class="eq"><span class="f"><i>λ<sub>r</sub></i> = <i>λ</i>(<i>r</i>/<i>R</i>)</span><span class="r"></span></div>
+        <div class="eq"><span class="f"><i>φ</i> = tan<sup>−1</sup><span class="num" style="font-style:normal">(</span><span class="frac num"><span>2</span><span>3<i>λ<sub>r</sub></i></span></span><span class="num" style="font-style:normal">)</span></span><span class="r">(3.78)</span></div>
+        <div class="eq"><span class="f"><i>c</i> = <span class="frac num"><span>8π<i>r</i> sin <i>φ</i></span><span>3<i>B C<sub>l</sub> λ<sub>r</sub></i></span></span></span><span class="r">(3.79)</span></div>
+        <div class="eq"><span class="f"><i>θ<sub>p</sub></i> = <i>φ</i> − <i>α</i></span><span class="r">(3.62)</span></div>
+        <div class="eq"><span class="f"><i>θ<sub>T</sub></i> = <i>θ<sub>p</sub></i> − <i>θ<sub>p,0</sub></i>&nbsp;&nbsp;<span style="font-family:-apple-system,sans-serif;font-style:normal;font-size:11.5px;color:var(--muted)">(θ<sub>p,0</sub> = −1.56°, twist = 0 at tip)</span></span><span class="r">(3.61)</span></div>
+        <div class="eq"><span class="f"><i>U</i><sub>rel</sub> = <i>U</i>(1 − <i>a</i>)/sin <i>φ</i></span><span class="r">(3.64)</span></div>
+        <div class="assume">
+          <span class="chip">no wake rotation, <i>a′</i> = 0</span>
+          <span class="chip">no drag, <i>C<sub>d</sub></i> = 0</span>
+          <span class="chip">no tip loss</span>
+          <span class="chip"><i>a</i> = 1/3 each annulus</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer>Manwell, McGowan &amp; Rogers — <i>Wind Energy Explained: Theory, Design and Application</i>, Ch. 3 (§3.7, Table 3.2, Figs. 3.24–3.26). Geometry, section angles and velocity triangle are computed continuously from the equations; Table 3.2 emerges at the printed stations.</footer>
+
+<script>
+'use strict';
+/* ================= physics — Manwell §3.7, ideal Betz rotor ================= */
+const DEG = Math.PI/180;
+const LAM = 7, NB = 3, CL = 1.0, ALPHA = 7.0, AX = 1/3;
+const phiDeg   = rR => Math.atan(2/(3*LAM*rR))/DEG;                    // (3.78)
+const PHI_TIP  = phiDeg(1);
+const thpDeg   = rR => phiDeg(rR) - ALPHA;                             // (3.62)
+const THP0     = thpDeg(1);                                            // pitch at tip
+const thtDeg   = rR => thpDeg(rR) - THP0;                              // (3.61)
+const cOverR   = rR => 8*Math.PI*rR*Math.sin(phiDeg(rR)*DEG)/(3*NB*CL*(LAM*rR)); // (3.79)
+const urelOverU= rR => (1-AX)/Math.sin(phiDeg(rR)*DEG);                // (3.64)
+
+const TABLE = [ // r/R, c/R, twist, phi, pitch — as printed in Table 3.2
+  [0.1,0.275,38.2,43.6,36.6],[0.2,0.172,20.0,25.5,18.5],[0.3,0.121,12.2,17.6,10.6],
+  [0.4,0.092, 8.0,13.4, 6.4],[0.5,0.075, 5.3,10.8, 3.8],[0.6,0.063, 3.6, 9.0, 2.0],
+  [0.7,0.054, 2.3, 7.7, 0.7],[0.8,0.047, 1.3, 6.8,-0.2],[0.9,0.042, 0.6, 6.0,-1.0],
+  [1.0,0.039, 0.0, 5.4,-1.6]];
+
+/* NACA 4415 profile, unit chord: closed loop TE → upper → LE → lower → TE */
+function nacaLoop(nSide){
+  const m=0.04,p=0.4,t=0.15,pts=[];
+  const yt=x=>5*t*(0.2969*Math.sqrt(x)-0.1260*x-0.3516*x*x+0.2843*x**3-0.1036*x**4);
+  const yc=x=> x<p ? m/(p*p)*(2*p*x-x*x) : m/((1-p)**2)*((1-2*p)+2*p*x-x*x);
+  const dy=x=> x<p ? 2*m/(p*p)*(p-x)     : 2*m/((1-p)**2)*(p-x);
+  for(let i=0;i<=nSide;i++){ const x=0.5*(1+Math.cos(Math.PI*i/nSide)); // TE→LE
+    const th=Math.atan(dy(x)); pts.push([x-yt(x)*Math.sin(th), yc(x)+yt(x)*Math.cos(th)]); }
+  for(let i=1;i<nSide;i++){ const x=0.5*(1-Math.cos(Math.PI*i/nSide)); // LE→TE
+    const th=Math.atan(dy(x)); pts.push([x+yt(x)*Math.sin(th), yc(x)-yt(x)*Math.cos(th)]); }
+  return pts;
+}
+
+/* chordwise station of the section's area centroid (unit chord) — the 2D panel
+   pivots the airfoil about this point ON the chord so the chord line always
+   passes through the diagram vertex */
+const SEC_CX=(()=>{
+  const pts=nacaLoop(60);let A=0,cx=0;
+  for(let i=0;i<pts.length;i++){
+    const [x0,y0]=pts[i],[x1,y1]=pts[(i+1)%pts.length];
+    const cr=x0*y1-x1*y0;A+=cr;cx+=(x0+x1)*cr;
+  }
+  return cx/(3*A);
+})();
+
+/* ================= shared state ================= */
+const state = {
+  rr:0.5, cur:0.5,
+  spin:true, wind:true, spinAng:0.55,
+  cam:{az:0.52, el:0.20, dist:3.15, fl:1.05, tgt:[0.05,0,-0.18]},
+};
+if (matchMedia('(prefers-reduced-motion: reduce)').matches){ state.spin=false; state.wind=false; }
+let dirty=true; // force 2D repaint after canvas resizes (resizing clears them)
+
+/* ================= 3D scene ================= */
+const BLADE_X = -0.20;          // rotor plane offset from hub centre (upwind)
+const GROUND_Z = -1.42;
+const LIGHT = norm3([-0.50,-0.45,0.74]);
+function norm3(v){const l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];}
+
+/* blade template in blade-local frame: span +Z, downwind +X, LE toward +Y.
+   Rotor spins at −ω about +X so blade 0 moves toward +Y — then the view from the
+   blade tip looking inboard (up = downwind) has blade motion to the LEFT, matching
+   Fig. 3.24 and the section panel exactly. */
+function sectionPts(rR, nSide, scale=1){
+  const base = 0.1;
+  const c  = cOverR(Math.max(rR,base)) * (rR<base ? 0.66+0.34*(rR-0.07)/(base-0.07) : 1) * scale;
+  const th = thpDeg(Math.max(rR,base))*DEG;
+  const cs = Math.cos(th), sn = Math.sin(th);
+  return nacaLoop(nSide).map(([u,v])=>{
+    const q=(u-0.30)*c, w=v*c;               // pitch axis at 30% chord; +w = suction (downwind)
+    return [w*cs+q*sn, w*sn-q*cs, rR];       // LE tipped upwind by θp
+  });
+}
+const STA=[0.07,0.085,0.1,0.12,0.15,0.19,0.24,0.30,0.37,0.44,0.52,0.60,0.68,0.76,0.84,0.91,0.96,1.0];
+const NSEC=14;                                // 28-pt section loops for the mesh
+const bladeLoops = STA.map(r=>sectionPts(r,NSEC));
+const NL = bladeLoops[0].length;
+
+function cylinder(x0,x1,r0,r1,nSeg,axis){ // frustum along X (axis='x') or Z ('z')
+  const rings=[];
+  for(const [pos,rad] of [[x0,r0],[x1,r1]]){
+    const ring=[];
+    for(let i=0;i<nSeg;i++){const a=2*Math.PI*i/nSeg,c=Math.cos(a)*rad,s=Math.sin(a)*rad;
+      ring.push(axis==='x'?[pos,c,s]:[c,s,pos]);}
+    rings.push(ring);
+  }
+  return rings;
+}
+function quadsFromRings(rings,closedCaps){
+  const f=[];const n=rings[0].length;
+  for(let s=0;s<rings.length-1;s++)for(let i=0;i<n;i++)
+    f.push([rings[s][i],rings[s][(i+1)%n],rings[s+1][(i+1)%n],rings[s+1][i]]);
+  if(closedCaps){f.push(rings[0].slice().reverse());f.push(rings[rings.length-1]);}
+  return f;
+}
+/* static geometry (world coords, hub at origin, wind blows +X) */
+const statFaces=[];
+(function build(){
+  const add=(faces,col)=>faces.forEach(p=>statFaces.push({p,col}));
+  add(quadsFromRings(cylinder(-0.10,-1.42,0.046,0.030,12,'z').map(r=>r.map(([x,y,z])=>[x+0.20,y,z])),true),[196,207,220]); // tower
+  const nx0=-0.10,nx1=0.46;                                            // nacelle
+  const N=[[nx0,-0.085,-0.095],[nx1,-0.085,-0.095],[nx1,0.085,-0.095],[nx0,0.085,-0.095],
+           [nx0,-0.085, 0.095],[nx1,-0.085, 0.095],[nx1,0.085, 0.095],[nx0,0.085, 0.095]];
+  [[0,1,2,3],[7,6,5,4],[0,3,7,4],[1,5,6,2],[3,2,6,7],[0,4,5,1]].forEach(ix=>statFaces.push({p:ix.map(i=>N[i]),col:[174,189,206]}));
+  const nose=[];                                                       // spinner
+  const prof=[[-0.44,0.001],[-0.40,0.045],[-0.33,0.078],[-0.24,0.096],[-0.13,0.100],[-0.06,0.100]];
+  for(const [px,pr] of prof){const ring=[];for(let i=0;i<12;i++){const a=2*Math.PI*i/12;ring.push([px,Math.cos(a)*pr,Math.sin(a)*pr]);}nose.push(ring);}
+  add(quadsFromRings(nose,false),[213,220,228]);
+})();
+
+/* wind streaks */
+const streaks=[];
+for(let i=0;i<15;i++){
+  const a=Math.random()*2*Math.PI, rad=0.25+Math.random()*1.0;
+  streaks.push({y:Math.cos(a)*rad, z:Math.sin(a)*rad*0.9, x:-2.4+Math.random()*3.6});
+}
+
+const c3d=document.getElementById('c3d');
+const g3=c3d.getContext('2d');
+let W3=0,H3=0,DPR=1;
+
+function camBasis(){
+  const c=state.cam, ce=Math.cos(c.el), se=Math.sin(c.el);
+  const C=[c.tgt[0]-c.dist*ce*Math.cos(c.az), c.tgt[1]-c.dist*ce*Math.sin(c.az), c.tgt[2]+c.dist*se];
+  const f=norm3([c.tgt[0]-C[0],c.tgt[1]-C[1],c.tgt[2]-C[2]]);
+  const r=norm3([f[1],-f[0],0]);                                      // f × ẑ
+  const u=[r[1]*f[2]-r[2]*f[1], r[2]*f[0]-r[0]*f[2], r[0]*f[1]-r[1]*f[0]];
+  return {C,f,r,u};
+}
+function mkProj(B){
+  const k=state.cam.fl*H3;
+  return p=>{
+    const dx=p[0]-B.C[0],dy=p[1]-B.C[1],dz=p[2]-B.C[2];
+    const z=dx*B.f[0]+dy*B.f[1]+dz*B.f[2];
+    if(z<0.08) return null;
+    return [W3/2+(dx*B.r[0]+dy*B.r[1]+dz*B.r[2])*k/z,
+            H3/2-(dx*B.u[0]+dy*B.u[1]+dz*B.u[2])*k/z, z];
+  };
+}
+function shade(col,p0,p1,p2){
+  const ax=p1[0]-p0[0],ay=p1[1]-p0[1],az=p1[2]-p0[2];
+  const bx=p2[0]-p0[0],by=p2[1]-p0[1],bz=p2[2]-p0[2];
+  let nx=ay*bz-az*by, ny=az*bx-ax*bz, nz=ax*by-ay*bx;
+  const l=Math.hypot(nx,ny,nz)||1;
+  const d=Math.abs((nx*LIGHT[0]+ny*LIGHT[1]+nz*LIGHT[2])/l);
+  const i=0.34+0.66*d;
+  return `rgb(${col[0]*i|0},${col[1]*i|0},${col[2]*i|0})`;
+}
+
+function draw3D(dt){
+  const B=camBasis(), proj=mkProj(B);
+  const bg=g3.createLinearGradient(0,0,0,H3);
+  bg.addColorStop(0,'#0A1322');bg.addColorStop(0.55,'#122336');bg.addColorStop(0.62,'#0E1D2C');bg.addColorStop(1,'#0A1520');
+  g3.fillStyle=bg;g3.fillRect(0,0,W3,H3);
+
+  // sea disk
+  g3.beginPath();let ok=true;
+  for(let i=0;i<=48;i++){const a=2*Math.PI*i/48;const p=proj([0.2+Math.cos(a)*3.4,Math.sin(a)*3.4,GROUND_Z]);
+    if(!p){ok=false;break;} i?g3.lineTo(p[0],p[1]):g3.moveTo(p[0],p[1]);}
+  if(ok){g3.fillStyle='rgba(76,138,178,0.10)';g3.fill();}
+
+  const prims=[];
+  const pushFace=(pts3,col)=>{
+    const n=pts3.length,scr=new Array(n);let zs=0;
+    for(let i=0;i<n;i++){const s=proj(pts3[i]);if(!s)return;scr[i]=s;zs+=s[2];}
+    prims.push({z:zs/n,scr,fill:shade(col,pts3[0],pts3[1],pts3[2])});
+  };
+  for(const f of statFaces) pushFace(f.p,f.col);
+
+  // blades
+  if(state.spin) state.spinAng-=dt*1.4;    // −ω about +X: see sectionPts comment.
+                                           // ω·R/U_wind = 1.4/0.2 = 7 = λ: animation runs at the design tip-speed ratio
+  const rot=new Array(NB);
+  for(let b=0;b<NB;b++){
+    const a=state.spinAng+b*2*Math.PI/3, ca=Math.cos(a), sa=Math.sin(a);
+    rot[b]=[ca,sa];
+    const P=bladeLoops.map(loop=>loop.map(([x,y,z])=>[x+BLADE_X, y*ca-z*sa, y*sa+z*ca]));
+    for(let s=0;s<P.length-1;s++)for(let i=0;i<NL;i++)
+      pushFace([P[s][i],P[s][(i+1)%NL],P[s+1][(i+1)%NL],P[s+1][i]],[227,233,240]);
+    pushFace(P[P.length-1],[227,233,240]);          // tip cap
+  }
+
+  // wind streaks (sorted with geometry)
+  if(state.wind){
+    for(const s of streaks){
+      s.x+=dt*0.2; if(s.x>1.5){s.x=-2.4;}   // wind speed 0.2 R/s pairs with ω=1.4 rad/s → λ=7
+      const a=proj([s.x,s.y,s.z]), b2=proj([s.x+0.38,s.y,s.z]);
+      if(a&&b2&&a[2]>1.15&&b2[2]>1.15) prims.push({z:(a[2]+b2[2])/2, line:[a,b2],
+        fill:`rgba(86,200,242,${0.34*Math.sin(Math.PI*Math.min(1,Math.max(0,(s.x+2.4)/3.9)))})`});
+    }
+  }
+
+  prims.sort((p,q)=>q.z-p.z);
+  for(const pr of prims){
+    if(pr.line){g3.strokeStyle=pr.fill;g3.lineWidth=1.3;g3.beginPath();
+      g3.moveTo(pr.line[0][0],pr.line[0][1]);g3.lineTo(pr.line[1][0],pr.line[1][1]);g3.stroke();continue;}
+    g3.beginPath();g3.moveTo(pr.scr[0][0],pr.scr[0][1]);
+    for(let i=1;i<pr.scr.length;i++)g3.lineTo(pr.scr[i][0],pr.scr[i][1]);
+    g3.closePath();g3.fillStyle=pr.fill;g3.fill();
+    g3.strokeStyle=pr.fill;g3.lineWidth=1;g3.stroke();
+  }
+
+  // ---- overlays: sweep circle + red station band on blade 0 ----
+  const rr=state.cur;
+  g3.setLineDash([5,6]);g3.strokeStyle='rgba(242,92,74,0.35)';g3.lineWidth=1;g3.beginPath();
+  let started=false;
+  for(let i=0;i<=72;i++){const a=2*Math.PI*i/72;const p=proj([BLADE_X,Math.cos(a)*rr,Math.sin(a)*rr]);
+    if(!p){started=false;continue;}
+    started?g3.lineTo(p[0],p[1]):g3.moveTo(p[0],p[1]);started=true;}
+  g3.stroke();g3.setLineDash([]);
+
+  const [ca,sa]=rot[0];
+  const band=sectionPts(rr,26,1.16).map(([x,y,z])=>{
+    const wy=y*ca-z*sa, wz=y*sa+z*ca; return proj([x+BLADE_X,wy,wz]);
+  });
+  if(band.every(Boolean)){
+    g3.beginPath();g3.moveTo(band[0][0],band[0][1]);
+    for(let i=1;i<band.length;i++)g3.lineTo(band[i][0],band[i][1]);
+    g3.closePath();
+    g3.strokeStyle='rgba(242,92,74,0.20)';g3.lineWidth=7;g3.stroke();
+    g3.strokeStyle='rgba(242,92,74,0.95)';g3.lineWidth=2.4;g3.stroke();
+  }
+  // wind label near streak entry
+  if(state.wind){const p=proj([-2.0,0.9,0.75]);
+    if(p){g3.fillStyle='rgba(86,200,242,0.75)';g3.font='11px -apple-system,sans-serif';g3.fillText('wind U',p[0],p[1]-4);}}
+}
+
+/* orbit / zoom */
+(function(){
+  const el=c3d;const pt=new Map();let lastD=0;
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);el.classList.add('dragging');});
+  el.addEventListener('pointermove',e=>{
+    if(!pt.has(e.pointerId))return;
+    const [px,py]=pt.get(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pt.size===1){state.cam.az+=(e.clientX-px)*0.005;state.cam.el=Math.min(1.25,Math.max(-0.12,state.cam.el+(e.clientY-py)*0.005));}
+    else if(pt.size===2){const a=[...pt.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);
+      if(lastD)state.cam.dist=Math.min(6.5,Math.max(1.7,state.cam.dist*lastD/d));lastD=d;}
+  });
+  const up=e=>{pt.delete(e.pointerId);lastD=0;if(!pt.size)el.classList.remove('dragging');};
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();state.cam.dist=Math.min(6.5,Math.max(1.7,state.cam.dist*Math.exp(e.deltaY*0.0012)));},{passive:false});
+})();
+
+/* ================= 2D section panel (Fig. 3.24) ================= */
+const c2d=document.getElementById('c2d');
+const g2=c2d.getContext('2d');
+let W2=0,H2=0;
+
+function arrow(g,x0,y0,x1,y1,col,w,dash){
+  g.save();if(dash)g.setLineDash(dash);
+  g.strokeStyle=col;g.fillStyle=col;g.lineWidth=w;
+  g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();
+  g.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),h=6.5+w*1.6;
+  g.beginPath();g.moveTo(x1,y1);
+  g.lineTo(x1-h*Math.cos(a-0.42),y1-h*Math.sin(a-0.42));
+  g.lineTo(x1-h*Math.cos(a+0.42),y1-h*Math.sin(a+0.42));
+  g.closePath();g.fill();g.restore();
+}
+const placed=[];
+function label(g,x,y,txt,col,size=11.5,bold=false,dir=-1){ // dir: −1 nudge up on collision, +1 down
+  g.font=`${bold?'600 ':''}${size}px ui-monospace,Menlo,monospace`;
+  const w=g.measureText(txt).width,h=size+3;
+  let bx=Math.min(Math.max(4,x-w/2),W2-w-6),by=y-h/2,tries=0;
+  while(tries<7&&placed.some(r=>bx<r.x+r.w+4&&bx+w+4>r.x&&by<r.y+r.h+3&&by+h+3>r.y)){by+=dir*(h+2);tries++;}
+  placed.push({x:bx,y:by,w,h});
+  g.fillStyle='rgba(18,31,51,0.72)';g.fillRect(bx-3,by-1,w+6,h+2);
+  g.fillStyle=col;g.textBaseline='middle';g.textAlign='left';g.fillText(txt,bx,by+h/2);
+}
+function arcAngle(g,V,r,a0,a1,col){ // math angles (y-up); sweeps the short way
+  if(Math.abs(a1-a0)<1e-4)return;
+  g.strokeStyle=col;g.lineWidth=1.6;g.beginPath();
+  g.arc(V[0],V[1],r,-a0,-a1,a1>a0);g.stroke();
+}
+
+function drawSection(){
+  placed.length=0;
+  const rr=state.cur;
+  const phi=phiDeg(rr)*DEG, thp=thpDeg(rr)*DEG, thp0=THP0*DEG;
+  const lamr=LAM*rr;
+  g2.clearRect(0,0,W2,H2);
+
+  const V=[W2*0.56,H2*0.435];
+  const Lc=Math.min(W2,H2)*2.35*cOverR(rr);   // airfoil drawn to c/R scale
+
+  // reference lines
+  g2.setLineDash([6,6]);g2.strokeStyle='#3A506B';g2.lineWidth=1;
+  g2.beginPath();g2.moveTo(14,V[1]);g2.lineTo(W2-14,V[1]);g2.stroke();          // plane of rotation
+  g2.beginPath();g2.moveTo(V[0],18);g2.lineTo(V[0],H2*0.70);g2.stroke();        // rotor axis
+  g2.setLineDash([]);
+  arrow(g2,V[0],44,V[0],24,'#7E8CA6',1.2);
+  label(g2,V[0]+72,30,'Ω · rotor axis (downwind ↑)','#7E8CA6',10.5);
+  label(g2,W2-64,V[1]+13,'plane of rotation','#7E8CA6',10.5,false,1);
+
+  // ghost: tip-chord reference line (θp,0 datum for twist)
+  g2.setLineDash([3,5]);g2.strokeStyle='rgba(147,163,188,0.5)';g2.lineWidth=1;
+  g2.beginPath();g2.moveTo(V[0],V[1]);
+  g2.lineTo(V[0]-Math.cos(thp0)*W2*0.31, V[1]+Math.sin(thp0)*W2*0.31);g2.stroke();g2.setLineDash([]);
+
+  // airfoil — pivots about its centroid station on the chord (at V), to c/R scale
+  const cd=[Math.cos(thp),Math.sin(thp)], nd=[-Math.sin(thp),Math.cos(thp)];
+  const P=(u,v)=>{const q=(u-SEC_CX)*Lc;
+    return [V[0]+cd[0]*q+nd[0]*v*Lc, V[1]-(cd[1]*q+nd[1]*v*Lc)];};
+  g2.beginPath();
+  nacaLoop(48).forEach(([u,v],i)=>{const s=P(u,v);i?g2.lineTo(s[0],s[1]):g2.moveTo(s[0],s[1]);});
+  g2.closePath();g2.fillStyle='rgba(86,200,242,0.07)';g2.fill();
+  g2.strokeStyle='#A9C4DC';g2.lineWidth=1.6;g2.stroke();
+  // chord line + extension (passes through V, the pivot)
+  g2.setLineDash([5,5]);g2.strokeStyle='#C8D6E4';g2.lineWidth=1;
+  const LEx=P(0,0), TEx=P(1,0), TEe=P(1+Math.min(0.35, 34/Lc),0);
+  g2.beginPath();g2.moveTo(LEx[0],LEx[1]);g2.lineTo(TEe[0],TEe[1]);g2.stroke();g2.setLineDash([]);
+  label(g2,TEe[0]+10,TEe[1]-9,'chord line','#C8D6E4',10.5);
+
+  // velocity triangle (true proportions, auto-fit)
+  const axU=1-AX, tanU=lamr;
+  const k=Math.min(W2*0.335/tanU, H2*0.255/axU);
+  const tpx=tanU*k, apx=axU*k;
+  const T=[V[0]-tpx,V[1]+apx], C=[V[0],V[1]+apx];
+  arrow(g2,T[0],T[1],C[0]-4,C[1],'#4FA8CE',1.8);
+  arrow(g2,C[0],C[1],V[0],V[1]+6,'#4FA8CE',1.8);
+  const stopD=Math.max(14, SEC_CX*Lc+10);   // stop the U_rel arrow just before the nose
+  arrow(g2,T[0],T[1],V[0]-Math.cos(phi)*stopD,V[1]+Math.sin(phi)*stopD,'#56C8F2',3);
+  label(g2,(T[0]+C[0])/2,T[1]+15,'rΩ(1+a′)','#4FA8CE',11,false,1);
+  label(g2,C[0]+44,(C[1]+V[1])/2,'U(1−a)','#4FA8CE',11,false,1);
+  label(g2,(T[0]+V[0])/2+Math.sin(phi)*18-14,(T[1]+V[1])/2+Math.cos(phi)*18,'U_rel','#56C8F2',12,true,1);
+  // blade motion hint
+  arrow(g2,V[0]-W2*0.27,V[1]-13,V[0]-W2*0.27-40,V[1]-13,'#5E7391',1.2);
+  label(g2,V[0]-W2*0.27-20,V[1]-26,'blade motion','#5E7391',10);
+
+  // forces at V
+  const FL=Math.min(W2,H2)*0.26;
+  const e=[Math.cos(phi),Math.sin(phi)];             // relative flow direction (up-right)
+  const Ld=[-e[1],e[0]];                             // lift ⊥ U_rel
+  const Ltip=[V[0]+Ld[0]*FL, V[1]-Ld[1]*FL];
+  const Ntip=[V[0], V[1]-FL*Math.cos(phi)];
+  const Ttip=[V[0]-FL*Math.sin(phi), V[1]];
+  g2.setLineDash([3,4]);g2.strokeStyle='rgba(255,180,84,0.45)';g2.lineWidth=1;
+  g2.beginPath();g2.moveTo(Ntip[0],Ntip[1]);g2.lineTo(Ltip[0],Ltip[1]);g2.lineTo(Ttip[0],Ttip[1]);g2.stroke();
+  g2.setLineDash([]);
+  arrow(g2,V[0],V[1],Ltip[0],Ltip[1],'#FFB454',2.6);
+  arrow(g2,V[0],V[1],Ntip[0],Ntip[1],'#E8A04C',1.8);
+  arrow(g2,V[0],V[1],Ttip[0],Ttip[1],'#E8A04C',1.8);
+  arrow(g2,V[0],V[1],V[0]+e[0]*74,V[1]-e[1]*74,'#8FA3BC',1.2,[3,4]);
+  label(g2,Ltip[0]-6,Ltip[1]-12,'dF_L','#FFB454',12,true);
+  label(g2,Ntip[0]+28,Ntip[1]-2,'dF_N','#E8A04C',11);
+  label(g2,Ttip[0]-8,Ttip[1]-13,'dF_T','#E8A04C',11);
+  label(g2,V[0]+e[0]*74+12,V[1]-e[1]*74-14,'dF_D=0 (C_d=0)','#8FA3BC',10);
+
+  // angle arcs — nested at the vertex, as in Fig. 3.24
+  const pi=Math.PI;
+  const arcL=(r,a0,a1,col,txt,size=11.5,bold=true,rext=16)=>{
+    arcAngle(g2,V,r,a0,a1,col);
+    const am=(a0+a1)/2;
+    label(g2,V[0]+Math.cos(am)*(r+rext),V[1]-Math.sin(am)*(r+rext),txt,col,size,bold,am>pi?1:-1);
+  };
+  arcL(40,pi,pi+thp0,'#93A3BC','θ_p,0',10,false,26);
+  arcL(56,pi+thp0,pi+thp,'#FFD166','θ_T',12,true,13);
+  arcL(84,pi,pi+thp,'#6FA8FF','θ_p',12,true,13);
+  arcL(118,pi,pi+phi,'#C79BF2','φ',13,true,13);
+  arcL(152,pi+thp,pi+phi,'#7FD1A8','α',12,true,13);
+  arcAngle(g2,V,58,pi/2,pi/2+phi,'#C79BF2');       // same φ between dF_N and dF_L
+  label(g2,V[0]+Math.cos(pi/2+phi/2)*70,V[1]-Math.sin(pi/2+phi/2)*70,'φ','#C79BF2',11);
+
+  label(g2,120,H2-14,'velocities & airfoil to scale · forces: direction only','#5E7391',10,false,-1);
+}
+
+/* ================= charts (Figs 3.25 / 3.26) ================= */
+function chart(canvas, yMax, yTicks, fn, col, yName){
+  const g=canvas.getContext('2d');
+  const draw=()=>{
+    const w=canvas.cw,h=canvas.ch;if(!w)return;
+    g.clearRect(0,0,w,h);
+    const mL=42,mR=12,mT=12,mB=26;
+    const X=x=>mL+(x-0.05)/(1-0.05)*(w-mL-mR);
+    const Y=y=>h-mB-(y/yMax)*(h-mT-mB);
+    g.strokeStyle='#24374F';g.lineWidth=1;
+    g.font='10px ui-monospace,Menlo,monospace';g.fillStyle='#8FA3BC';g.textAlign='right';g.textBaseline='middle';
+    for(const t of yTicks){g.beginPath();g.setLineDash(t?[3,5]:[]);g.moveTo(mL,Y(t));g.lineTo(w-mR,Y(t));g.strokeStyle=t?'#1B2C44':'#24374F';g.stroke();g.setLineDash([]);g.fillText(String(t),mL-6,Y(t));}
+    g.textAlign='center';g.textBaseline='top';
+    for(let t=0.2;t<=1.001;t+=0.2){g.beginPath();g.setLineDash([3,5]);g.strokeStyle='#1B2C44';g.moveTo(X(t),Y(0));g.lineTo(X(t),mT);g.stroke();g.setLineDash([]);g.fillText(t.toFixed(1),X(t),h-mB+6);}
+    g.strokeStyle='#24374F';g.beginPath();g.moveTo(mL,mT);g.lineTo(mL,Y(0));g.lineTo(w-mR,Y(0));g.stroke();
+    g.fillStyle='#8FA3BC';g.textAlign='left';g.fillText('r/R',w-mR-22,h-mB+6);
+    g.textAlign='right';g.fillText(yName,mL+16,1);
+    // curve
+    g.strokeStyle=col;g.lineWidth=2;g.beginPath();
+    for(let i=0;i<=140;i++){const x=0.05+i/140*0.95;const p=[X(x),Y(fn(x))];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}
+    g.stroke();
+    // station dots
+    g.fillStyle=col;
+    for(const row of TABLE){g.beginPath();g.arc(X(row[0]),Y(fn(row[0])),2.6,0,7);g.fill();}
+    // cursor
+    const rr=state.cur;
+    g.strokeStyle='rgba(242,92,74,0.85)';g.lineWidth=1.2;g.beginPath();g.moveTo(X(rr),mT);g.lineTo(X(rr),Y(0));g.stroke();
+    g.beginPath();g.fillStyle='#F25C4A';g.arc(X(rr),Y(fn(rr)),4.4,0,7);g.fill();
+    g.lineWidth=2;g.strokeStyle='#0C1626';g.stroke();
+  };
+  const set=e=>{
+    const r=canvas.getBoundingClientRect();
+    const x=0.05+((e.clientX-r.left)-42)/(canvas.cw-42-12)*0.95;
+    setRR(Math.min(1,Math.max(0.1,x)));
+  };
+  canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);canvas.dn=1;set(e);});
+  canvas.addEventListener('pointermove',e=>{if(canvas.dn)set(e);});
+  canvas.addEventListener('pointerup',()=>canvas.dn=0);
+  return draw;
+}
+const chChord=document.getElementById('chChord'), chTwist=document.getElementById('chTwist');
+const drawChord=chart(chChord,0.4,[0,0.1,0.2,0.3,0.4],cOverR,'#56C8F2','c/R');
+const drawTwist=chart(chTwist,60,[0,10,20,30,40,50,60],thtDeg,'#FFB454','θT, deg');
+
+/* ================= table ================= */
+const tbody=document.querySelector('#tbl tbody');
+for(const row of TABLE){
+  const tr=document.createElement('tr');tr.dataset.row=row[0];tr.tabIndex=0;
+  tr.innerHTML=`<td>${row[0].toFixed(1)}</td><td>${row[1].toFixed(3)}</td><td>${row[2].toFixed(1)}</td><td>${row[3].toFixed(1)}</td><td>${row[4].toFixed(1)}</td>`;
+  tr.addEventListener('click',()=>setRR(row[0]));
+  tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setRR(row[0]);}});
+  tbody.appendChild(tr);
+}
+
+/* ================= wiring ================= */
+const slider=document.getElementById('slider');
+const $=id=>document.getElementById(id);
+const RO={rr:$('rrVal'),lr:$('roLr'),phi:$('roPhi'),thp:$('roThp'),tht:$('roTht'),c:$('roC'),urel:$('roUrel'),id1:$('id1'),id2:$('id2')};
+let lastRow=null,lastTxt='';
+
+function setRR(v){
+  const snapped=Math.round(v*10)/10;
+  state.rr=(Math.abs(v-snapped)<0.012)?snapped:v;
+  slider.value=state.rr;
+  slider.style.setProperty('--fill',((state.rr-0.1)/0.9*100)+'%');
+}
+slider.addEventListener('input',()=>setRR(parseFloat(slider.value)));
+
+const fmt=(v,n)=>v.toFixed(n).replace('-','−');
+function updateReadouts(){
+  const rr=state.cur, phi=phiDeg(rr), thp=thpDeg(rr), tht=thtDeg(rr);
+  const txt=rr.toFixed(3);
+  if(txt===lastTxt)return; lastTxt=txt;
+  RO.rr.textContent=rr.toFixed(2);
+  RO.lr.textContent=(LAM*rr).toFixed(2);
+  RO.phi.textContent=fmt(phi,1)+'°';
+  RO.thp.textContent=fmt(thp,1)+'°';
+  RO.tht.textContent=fmt(tht,1)+'°';
+  RO.c.textContent=cOverR(rr).toFixed(3);
+  RO.urel.textContent=urelOverU(rr).toFixed(2);
+  // identity strip: 2 decimals, with the left side computed FROM the printed operands
+  // so the displayed arithmetic is always exact (rounding each side independently can differ in the last digit)
+  const tht2=(Math.round(thp*100)-Math.round(THP0*100))/100;
+  RO.id1.textContent=`${fmt(phi,2)}° = ${fmt(thp,2)}° + 7.00°`;
+  RO.id2.textContent=`${fmt(tht2,2)}° = ${fmt(thp,2)}° − (${fmt(THP0,2)}°)`;
+  const near=Math.round(rr*10)/10;
+  const row=tbody.querySelector(`tr[data-row="${near}"]`);
+  if(row!==lastRow){lastRow&&lastRow.classList.remove('on');row&&row.classList.add('on');lastRow=row;}
+}
+
+$('btnSpin').addEventListener('click',e=>{state.spin=!state.spin;e.currentTarget.setAttribute('aria-pressed',state.spin);e.currentTarget.textContent=`Rotor: ${state.spin?'on':'off'}`;});
+$('btnWind').addEventListener('click',e=>{state.wind=!state.wind;e.currentTarget.setAttribute('aria-pressed',state.wind);e.currentTarget.textContent=`Wind: ${state.wind?'on':'off'}`;});
+$('btnReset').addEventListener('click',()=>{state.cam.az=0.52;state.cam.el=0.20;state.cam.dist=3.15;});
+$('btnSpin').setAttribute('aria-pressed',state.spin);
+$('btnSpin').textContent=`Rotor: ${state.spin?'on':'off'}`;
+$('btnWind').setAttribute('aria-pressed',state.wind);
+$('btnWind').textContent=`Wind: ${state.wind?'on':'off'}`;
+
+/* resize */
+function fit(canvas){
+  const r=canvas.parentElement.getBoundingClientRect();
+  DPR=window.devicePixelRatio||1;
+  canvas.width=r.width*DPR;canvas.height=r.height*DPR;
+  canvas.cw=r.width;canvas.ch=r.height;
+  canvas.getContext('2d').setTransform(DPR,0,0,DPR,0,0);
+  return [r.width,r.height];
+}
+function resizeAll(){
+  [W3,H3]=fit(c3d); [W2,H2]=fit(c2d); fit(chChord); fit(chTwist);
+  lastTxt=''; dirty=true;
+}
+new ResizeObserver(resizeAll).observe(document.getElementById('stage'));
+window.addEventListener('resize',resizeAll);
+resizeAll();
+setRR(0.5);
+
+/* main loop */
+let tPrev=performance.now(), lastDrawn=-1;
+function loop(t){
+  const dt=Math.min(0.05,(t-tPrev)/1000);tPrev=t;
+  state.cur+=(state.rr-state.cur)*Math.min(1,dt*9);
+  if(Math.abs(state.rr-state.cur)<0.0004)state.cur=state.rr;
+  draw3D(dt);
+  if(dirty||state.cur!==lastDrawn){drawSection();drawChord();drawTwist();updateReadouts();lastDrawn=state.cur;dirty=false;}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
