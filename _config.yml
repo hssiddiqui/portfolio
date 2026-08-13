@@ -20,6 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Columbia University, specializing in geospatial data science, remote
   sensing, and machine learning for energy access in Sub-Saharan Africa.
 github_username: hssiddiqui
+og_image: /assets/images/headshot.jpg
 minimal_mistakes_skin: dark
 search: true
 

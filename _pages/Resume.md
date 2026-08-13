@@ -52,6 +52,7 @@ Adept and motivated engineer with extensive experience in **geospatial data scie
 ---
 
 ## 🔬 Selected Projects
+*See the [Projects page](/projects/) for detailed write-ups and interactive demos of select highlights below.*
 
 ### **GenAI Projects** | AI agents, generative AI, LLMs (Jan 2025 - Present)
 * Developed a **coding agent using Gemini** that can interact and modify a codebase and execute code to get feedback.
