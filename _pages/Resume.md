@@ -15,7 +15,7 @@ Ph.D Teaching Fellow specializing in statistical frameworks, geospatial data sci
 ## 🎓 Education
 
 ### **Columbia University in the City of New York**
-* **Ph.D. in Mechanical Engineering**, GPA: 3.98/4.0, Aug 2021 - May 2026 (expected)
+* **Ph.D. in Mechanical Engineering**, GPA: 3.98/4.0, Aug 2021 - October 2026 (expected)
     * *Dissertation Title:* Remote Sensing methods for studying the impact of irrigation on energy access in Sub-Saharan Africa
     * *Coursework:* Cloud Computing and Big Data, Deep Learning for Computer Vision, Data-Driven Decision Modeling
 
@@ -38,6 +38,9 @@ Ph.D Teaching Fellow specializing in statistical frameworks, geospatial data sci
 ---
 
 ## 💼 Professional Experience
+
+### **Dept. of Mechanical Engineering, Columbia University in the City of New York**	*New York, NY*  
+* *PhD Teaching Fellow, Energy Sources and Conversion	Fall 2026*
 
 ### **Researcher/Staff, Quadracci Sustainable Engineering Lab** | *New York, NY* | Jan 2020 - Dec 2021
 * Led the **onboarding of 20 Ugandan researchers** and training on leveraging GIS for agricultural research.
