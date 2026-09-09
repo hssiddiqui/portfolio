@@ -8,7 +8,7 @@ layout: splash
 # Hasan Siddiqui
 
 ## 📄 Summary
-Adept and motivated engineer with extensive experience in **geospatial data science**, **cloud computing**, **machine learning**, statistical frameworks, **generative AI**, and **AI agents**. Demonstrated experience in solving complex problems, conducting independent research, and delivering data products and solutions to government departments in sub-Saharan Africa. Highly skilled in technical communication, scientific writing, and interdisciplinary project management.
+Ph.D Teaching Fellow specializing in statistical frameworks, geospatial data science and time series analysis. Background in energy systems that includes evaluating different energy generation, distribution and storage technologies for decarbonization pathways. Doctoral research focused on least-cost energy access solutions in sub-Saharan Africa using high-dimensional geospatial datasets and remote sensing analytics to predict energy demand and quantify model uncertainties and risks. Expertise in predictive modeling, spatial optimization, and enterprise analytics with the ability to translate complex spatial insights into actionable business recommendations. Mentored and taught core engineering concepts to students at Columbia University. 
 
 ---
 
@@ -30,10 +30,10 @@ Adept and motivated engineer with extensive experience in **geospatial data scie
 
 ## 🛠️ Skills
 
-* **GIS:** QGIS, ENVI, Google Earth Engine
-* **Programming:** Python, JavaScript, Matlab, SQL
-* **Cloud Computing:** Amazon Web Service, Google Cloud Platform
-* **Data Science/ML:** Classification, Detection, Segmentation, Mixture Modeling, PCA, genAI, AI agents
+* **Programming:** Python, JavaScript, SQL, Bash/Shell 
+* **Cloud Computing & Infrastructure:** Google Cloud Platform, Amazon Web Service, Orchestration, CI/CD pipelines, Docker, GitHub, Spark  
+* **Data Science:** TensorFlow, Scikit-learn, dimensionality reduction (PCA, UMAP), Time-series analysis, A/B Testing, Logit Models, Regression Analysis, GenAI/LLMs  
+* **Geospatial/GIS:** QGIS, ArcGIS (Pro, Online), ENVI, Google Earth Engine
 
 ---
 
@@ -42,7 +42,7 @@ Adept and motivated engineer with extensive experience in **geospatial data scie
 ### **Researcher/Staff, Quadracci Sustainable Engineering Lab** | *New York, NY* | Jan 2020 - Dec 2021
 * Led the **onboarding of 20 Ugandan researchers** and training on leveraging GIS for agricultural research.
 * Spearheaded the development of a **CWP dashboard** to share data products and results with stakeholders.
-* Mentored on-field surveyors to collect PUE data across 42% of Uganda's land area.
+* Trained on-field surveyors to collect productive energy use data through a national-scale Uganda survey. 
 * Enhanced engagement among e-GUIDE members through mentorship, sharing datasets, and collaboration on projects.
 
 ### **Network and Retail Intern, Shell Pakistan Limited** | *Karachi, PK* | Jun 2017 - Aug 2017
@@ -55,8 +55,8 @@ Adept and motivated engineer with extensive experience in **geospatial data scie
 *See the [Projects page](/projects/) for detailed write-ups and interactive demos of select highlights below.*
 
 ### **GenAI Projects** | AI agents, generative AI, LLMs (Jan 2025 - Present)
-* Developed a **coding agent using Gemini** that can interact and modify a codebase and execute code to get feedback.
-* Coded a **STAC agent using Ollama** to search for remote sensing imagery using natural language query.
+* Designed Claude Code skills to automate multi-step research and operations tasks, encoding domain specific SOPs (evaluation rubrics, tone/style rules) to achieve output consistency and auditability across runs.  
+* Built a CLI coding agent using the Gemini API and a function-calling loop, giving the model tools to scan, read, and write project files and execute Python scripts (including tests) to complete natural-language coding tasks.
 
 ### **Remote Sensing Projects** | GIS, machine learning, algorithms (Aug 2021 - Present)
 * Generated a **phenology map using PCA in ENVI** for classification of temporal vegetation patterns across Africa.
@@ -74,11 +74,10 @@ Adept and motivated engineer with extensive experience in **geospatial data scie
 
 ---
 
-## 📚 Publications
+## 📚 Selected Publications
 
-1.  Siddiqui, H., Small, C., and Modi, V. (2025), Operationalizing remote sensing methods for smallholder dry season irrigation detection in sub-Saharan Africa. *Front. Remote Sens.*
-2.  Siddiqui, H., and Modi, V. (2024). "Monitoring the impacts of disruption events on agriculture through irrigation detection with remote sensing," in *2024 IEEE Global Humanitarian Technology Conference (GHTC)* (IEEE), 286-291.
-3.  Walsh, M., Modi, V., and Siddiqui, H. (2023). Stacked spatial predictions of smallholder irrigation in Uganda.
-4.  Walsh, M., Modi, V., and Siddiqui, H. (2023). Bayesian multilevel regression and irrigation survey poststratification on a discrete grid in Uganda.
+1. Siddiqui, H., and Modi, V. (2026). How high household demand and low non-household demand estimates shaped electricity planning in the last two decades. (In Review)  
+2. Siddiqui, H., Small, C., and Modi, V. (2026). From Foundational Models to Interpretability: A Comparative Study of Embeddings and Feature Engineering for Smallholder Irrigation Detection in Sub-Saharan Africa. Front. Remote Sens. 7  
+3. Siddiqui, H., Small, C., and Modi, V. (2025). Operationalizing remote sensing methods for smallholder dry season irrigation detection in sub-Saharan Africa. Front. Remote Sens. 6\.
 
 ---
