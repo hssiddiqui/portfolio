@@ -1,4 +1,4 @@
-# Hasan Siddiqui — Portfolio
+# Hasan Siddiqui Portfolio
 
 Source for my personal academic portfolio site, built with Jekyll and the [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) remote theme, hosted on GitHub Pages.
 
